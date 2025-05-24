@@ -7,9 +7,13 @@ from datetime import datetime
 def log_queries(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        # get the current time
+        now = datetime.now()
+        timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+
         query = kwargs.get('query') or (args[0] if args else None)
         if query:
-            print(f"[SQL LOG] Executing query: {query}")
+            print(f"{[timestamp]}Executing query: {query}")
         else:
             print("[SQL LOG] No query found in arguments.")
         return func(*args, **kwargs)
@@ -53,6 +57,6 @@ def test():
     conn.close()
 
 
-test()
+# test()
 # Fetch users while logging the query
 users = fetch_all_users(query="SELECT * FROM users")

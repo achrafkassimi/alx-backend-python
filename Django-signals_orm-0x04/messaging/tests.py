@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import Message, Notification, MessageHistory
+from django.utils import timezone
+
 
 class NotificationTestCase(TestCase):
     
@@ -40,14 +42,23 @@ class MessageTestCase(TestCase):
         self.user1 = User.objects.create_user(username='user1', password='password')
         self.user2 = User.objects.create_user(username='user2', password='password')
 
-    def test_message_history(self):
-        # Créer un message
+    def test_message_edit(self):
+        # Create a message
         message = Message.objects.create(sender=self.user1, receiver=self.user2, content="Hello!")
-        # Modifier le message
+        
+        # Edit the message
         message.content = "Hello, how are you?"
         message.save()
 
-        # Vérifier que l'historique du message est bien créé
+        # Fetch the message again and check if it was edited
+        message.refresh_from_db()
+
+        # Check that the edited fields were updated
+        self.assertTrue(message.edited)
+        self.assertEqual(message.edited_by, self.user1)  # The user who edited the message
+        self.assertTrue(message.edited_at <= timezone.now())  # The timestamp should be current or before now
+
+        # Check if the message history was created
         history = MessageHistory.objects.filter(message=message)
         self.assertEqual(history.count(), 1)
         self.assertEqual(history.first().old_content, "Hello!")

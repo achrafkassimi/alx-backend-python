@@ -1,10 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from messaging.models import Message
 from .helpers import get_thread
 from django.db.models import Prefetch
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
+from django.contrib.auth import logout
 
+
+@login_required
+def delete_user(request):
+    user = request.user
+    logout(request) 
+    user.delete()
+    return redirect('login')
 
 def conversation_thread(request):
     # On récupère tous les messages racines

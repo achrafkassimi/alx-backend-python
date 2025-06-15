@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from messaging.models import Message
 from .helpers import get_thread
-from django.db.models import Prefetch
+# from django.db.models import Prefetch
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
 from django.contrib.auth import logout
@@ -15,12 +15,19 @@ def delete_user(request):
     return redirect('login')
 
 
-def conversation_thread(request):
-    # On récupère tous les messages racines
-    messages = Message.objects.filter(parent_message__isnull=True).select_related('sender', 'receiver').prefetch_related(
-        Prefetch('replies', queryset=Message.objects.select_related('sender'))
-    )
-    return render(request, 'messages/thread.html', {'messages': messages})
+# def conversation_thread(request):
+#     # On récupère tous les messages racines
+#     messages = Message.objects.filter(parent_message__isnull=True).select_related('sender', 'receiver').prefetch_related(
+#         Prefetch('replies', queryset=Message.objects.select_related('sender'))
+#     )
+#     return render(request, 'messages/thread.html', {'messages': messages})
+
+def threaded_conversation_view(request):
+    messages = Message.objects.filter(receiver=request.user, parent_message__isnull=True) \
+        .select_related('sender', 'receiver') \
+        .prefetch_related('replies')
+
+    return render(request, 'messaging/thread.html', {'messages': messages})
 
 
 def view_message_thread(request, message_id):
@@ -49,3 +56,7 @@ def conversation_messages(request, conversation_id):
     # logique pour récupérer messages
     messages = Message.objects.filter(conversation_id=conversation_id).order_by('created_at')
     return render(request, 'messaging/conversation.html', {'messages': messages})
+
+def unread_messages_view(request):
+    unread = Message.unread.unread_for_user(request.user)
+    return render(request, 'messaging/unread.html', {'unread_messages': unread})

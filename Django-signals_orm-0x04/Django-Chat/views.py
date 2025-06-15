@@ -1,6 +1,17 @@
 # Django-Chat/views.py
 from django.shortcuts import render
 from messaging.models import Message, MessageHistory
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.contrib.auth import logout
+
+@login_required
+def delete_user(request):
+    user = request.user
+    logout(request) 
+    user.delete()
+    return redirect('login')
+
 
 def message_history_view(request, message_id):
     message = Message.objects.get(id=message_id)

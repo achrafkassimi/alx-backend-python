@@ -56,6 +56,8 @@ MIDDLEWARE = [
     'chats.middleware.RestrictAccessByTimeMiddleware',
     'chats.middleware.OffensiveLanguageMiddleware',
     'chats.middleware.RolepermissionMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 
 ]
 

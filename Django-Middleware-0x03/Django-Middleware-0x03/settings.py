@@ -57,8 +57,6 @@ MIDDLEWARE = [
     'chats.middleware.OffensiveLanguageMiddleware',
     'chats.middleware.RolepermissionMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-
 ]
 
 ROOT_URLCONF = 'Django-Middleware-0x03.urls'
